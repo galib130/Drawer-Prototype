@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -69,9 +70,34 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
              result=autocomplete.text.toString()
             val toast=Toast.makeText(applicationContext,"You've selected "+result,Toast.LENGTH_SHORT)
             toast.show()
+            hidekeyboard()
+        }
+        autocomplete.setOnEditorActionListener { textView, i, keyEvent ->
+
+            result=autocomplete.text.toString()
+            val toast=Toast.makeText(applicationContext,"You've selected "+result,Toast.LENGTH_SHORT)
+            toast.show()
+            hidekeyboard()
+            return@setOnEditorActionListener true
         }
 
     }
+
+
+        fun hidekeyboard()
+        {
+            val view=this.currentFocus
+            if(view!=null)
+            {
+                val hideme= getSystemService(Context.INPUT_METHOD_SERVICE)as InputMethodManager
+                hideme.hideSoftInputFromWindow(view.windowToken,0)
+            }
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        }
+
+
+
+
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -128,45 +154,5 @@ class MainActivity : AppCompatActivity(),NavigationView.OnNavigationItemSelected
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_search,menu)
-        val manager= getSystemService(Context.SEARCH_SERVICE)as SearchManager
-        val searchItem= menu?.findItem(R.id.action_search)
-        val searchView =searchItem?.actionView as SearchView
 
-
-            searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    searchView.clearFocus()
-                    return true
-                }
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    if(newText!!.isNotEmpty())
-                    {
-                       list.clear()
-                        val search=newText.toLowerCase()
-                        list2.forEach {
-                                if(it.toLowerCase().contains(search))
-                                {
-                                     list.add(it)
-
-                                }
-                        }
-                    }
-                    else
-                    {
-
-
-                    }
-                    return true
-                }
-
-            })
-
-
-
-
-        return super.onCreateOptionsMenu(menu)
-    }
 }
